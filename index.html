@@ -76,14 +76,14 @@ button{
   width:40px;
   height:40px;
   border-radius:50%;
-  background:#fff;
-  color:#555;
+  background:var(--card);
+  color:var(--text);
   border:1px solid var(--line);
 }
 
 /* 残高 */
 .balance-card{
-  background:#111827;
+  background:var(--accent);
   color:white;
   border-radius:24px;
   padding:25px 23px 22px;
@@ -144,7 +144,7 @@ button{
 }
 
 .action{
-  background:#fff;
+  background:var(--card);
   border:1px solid var(--line);
   border-radius:18px;
   padding:17px;
@@ -203,24 +203,7 @@ button{
   margin:0 0 15px;
 }
 
-/* クイック */
-.quick{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:9px;
-}
 
-.quick button{
-  background:#f3f4f6;
-  color:#202329;
-  padding:13px 5px;
-  border-radius:12px;
-  font-weight:650;
-}
-
-.quick button:active{
-  background:#e7e8eb;
-}
 
 /* フォーム */
 .form{
@@ -253,7 +236,7 @@ input,select{
 
 input:focus,select:focus{
   border-color:#aeb2ba;
-  background:#fff;
+  background:var(--card);
 }
 
 .submit{
@@ -261,7 +244,7 @@ input:focus,select:focus{
   margin-top:15px;
   padding:13px;
   border-radius:12px;
-  background:#111827;
+  background:var(--accent);
   color:#fff;
   font-weight:700;
 }
@@ -285,7 +268,9 @@ input:focus,select:focus{
   width:40px;
   height:40px;
   border-radius:11px;
-  background:#f3f4f6;
+  background:var(--bg);
+  color:var(--text);
+  border:1px solid var(--line);
 }
 
 .month input{
@@ -319,7 +304,7 @@ input:focus,select:focus{
   display:flex;
   align-items:center;
   justify-content:center;
-  background:#f2f3f5;
+  background:var(--bg);
 }
 
 .history-info{
@@ -355,8 +340,9 @@ input:focus,select:focus{
   margin-left:6px;
   padding:7px 9px;
   border-radius:9px;
-  background:#eef2ff;
-  color:#4f46e5;
+  background:var(--bg);
+  color:var(--accent);
+  border:1px solid var(--line);
   font-size:11px;
 }
   
@@ -364,8 +350,9 @@ input:focus,select:focus{
   margin-left:6px;
   padding:7px 9px;
   border-radius:9px;
-  background:#f1f1f2;
-  color:#777;
+  background:var(--bg);
+  color:var(--text);
+  border:1px solid var(--line);
   font-size:11px;
 }
 
@@ -518,11 +505,12 @@ input:focus,select:focus{
     font-size: 22px;
 }
 
-.menu-section {
-    background: white;
-    border-radius: 16px;
-    padding: 6px 16px;
-    margin-bottom: 16px;
+.menu-section{
+  background:var(--card);
+  color:var(--text);
+  border-radius:16px;
+  padding:6px 16px;
+  margin-bottom:16px;
 }
 
 .menu-section-title {
@@ -733,7 +721,7 @@ body.dark .filter-select{
 
 .chart-bar-bg{
   height:11px;
-  background:#eef0f2;
+  background:var(--line);
   border-radius:999px;
   overflow:hidden;
 }
@@ -923,8 +911,9 @@ body.dark .filter-select{
 .fixed-item-actions button{
   padding:6px 9px;
   border-radius:8px;
-  background:#f1f1f2;
-  color:#555;
+  background:var(--bg);
+  color:var(--text);
+  border:1px solid var(--line);
   font-size:11px;
 }
 
@@ -1059,7 +1048,52 @@ body.dark .category-cancel{
     display: none;
   }
 }
-  
+
+.installment-item {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.installment-item-name {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.installment-item-info {
+  color: var(--sub);
+  font-size: 12px;
+  line-height: 1.8;
+  margin: 5px 0;
+}
+
+.installment-payment-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  margin-top: 8px;
+  border-radius: 10px;
+  background: var(--bg);
+  font-size: 12px;
+}
+
+.installment-paid-button {
+  padding: 9px 12px;
+  border-radius: 9px;
+  background: var(--income);
+  color: white;
+  white-space: nowrap;
+}
+
+.installment-note,
+.installment-empty {
+  font-size: 12px;
+  color: var(--sub);
+  line-height: 1.7;
+  margin-top: 10px;
+}
+    
 </style>
 </head>
   
@@ -1158,16 +1192,39 @@ body.dark .category-cancel{
 
   </div>
 
-  <!-- クイック支出 -->
-  <div class="card">
-    <div class="card-title">クイック支出</div>
+<!-- 分割払い管理 -->
+<div class="card" id="installmentCard">
+  <div class="card-title">💳 分割払い</div>
+  <div id="installmentList"></div>
 
-    <div class="quick">
-      <button onclick="quickExpense(500)">¥500</button>
-      <button onclick="quickExpense(1000)">¥1,000</button>
-      <button onclick="quickExpense(2000)">¥2,000</button>
-    </div>
+  <div class="form show" id="installmentForm">
+    <label>商品・契約名</label>
+    <input type="text" id="installmentName" placeholder="例：パソコン">
+
+    <label>購入総額（円）</label>
+    <input type="number" id="installmentTotal" min="1" placeholder="例：120000">
+
+    <label>分割回数</label>
+    <input type="number" id="installmentCount" min="2" max="120" placeholder="例：12">
+
+    <label>カテゴリー</label>
+    <select id="installmentCategory" data-category-select></select>
+
+    <label>毎月の引き落とし日</label>
+    <input type="number" id="installmentDay" min="1" max="31" placeholder="例：27">
+
+    <label>初回引き落とし月</label>
+    <input type="month" id="installmentStartMonth">
+
+    <button class="submit" onclick="addInstallment()">
+      分割払いを登録する
+    </button>
+
+    <p class="installment-note">
+      実際の引き落としを確認してから「支払い済み」を押すと、支出に計上されます。
+    </p>
   </div>
+</div>
 
 <!-- 月別集計 -->
 <!-- 月別集計 -->
@@ -1408,13 +1465,24 @@ let data = JSON.parse(
 ) || {
   incomes: [],
   expenses: [],
-  fixedExpenses: []
+  fixedExpenses: [],
+  installments: [],
+  categories: []
 };
 
 if(!Array.isArray(data.fixedExpenses)){
   data.fixedExpenses = [];
 }
+if (!Array.isArray(data.installments)) {
+  data.installments = [];
+}
 
+data.installments.forEach(item => {
+  if (!Array.isArray(item.payments)) {
+    item.payments = [];
+  }
+});
+     
 /* =========================
    カテゴリ
 ========================= */
@@ -1428,7 +1496,10 @@ const defaultCategories = [
   "その他"
 ];
 
-if(!Array.isArray(data.categories)){
+if(
+  !Array.isArray(data.categories) ||
+  data.categories.length === 0
+){
   data.categories = [...defaultCategories];
 }
 
@@ -1465,7 +1536,6 @@ function yen(amount){
   
 /* 保存 */
 function saveData(){
-
   localStorage.setItem(
     "expenseManagerData",
     JSON.stringify(data)
@@ -1562,20 +1632,220 @@ function addExpense(){
   saveData();
 }
 
+// 分割払いの回数を計算
+function getInstallmentNumber(item, month) {
+  if (month < item.startMonth) return 0;
 
-/* クイック支出 */
-function quickExpense(amount){
+  const start = new Date(item.startMonth + "-01");
+  const target = new Date(month + "-01");
 
-  document.getElementById("expenseAmount").value = amount;
+  const number =
+    (target.getFullYear() - start.getFullYear()) * 12 +
+    target.getMonth() - start.getMonth() + 1;
 
-  const form = document.getElementById("expenseForm");
+  return number >= 1 && number <= Number(item.count)
+    ? number
+    : 0;
+}
 
-  form.classList.add("show");
+// 1回あたりの支払額（端数は最終回に調整）
+function getInstallmentAmount(item, number) {
+  const total = Number(item.totalAmount);
+  const count = Number(item.count);
 
-  form.scrollIntoView({
-    behavior:"smooth",
-    block:"center"
+  if (!number || !count) return 0;
+
+  const base = Math.floor(total / count);
+
+  return number === count
+    ? total - base * (count - 1)
+    : base;
+}
+
+// 各月の引き落とし日
+function getInstallmentDueDate(item, month) {
+  const [year, monthNumber] = month.split("-").map(Number);
+  const lastDay = new Date(year, monthNumber, 0).getDate();
+  const day = Math.min(Number(item.day), lastDay);
+
+  return new Date(year, monthNumber - 1, day);
+}
+
+// その月の支払いが済んでいるか
+function isInstallmentPaid(item, month) {
+  return item.payments.some(p => p.month === month);
+}
+
+// 実際に支払い済みとした分割払いを取得
+function getPaidInstallmentPaymentsForMonth(month) {
+  const result = [];
+
+  data.installments.forEach(item => {
+    item.payments.forEach(payment => {
+      if (!payment.paidAt || payment.paidAt.slice(0, 7) !== month) return;
+
+      const number = getInstallmentNumber(item, payment.month);
+      if (!number) return;
+
+      result.push({
+        item,
+        payment,
+        number,
+        amount: getInstallmentAmount(item, number)
+      });
+    });
   });
+
+  return result;
+}
+
+// 支払い済みの分割払い総額
+function getPaidInstallmentExpenseTotal() {
+  return data.installments.reduce((sum, item) => {
+    return sum + item.payments.reduce((sub, payment) => {
+      const number = getInstallmentNumber(item, payment.month);
+      return sub + getInstallmentAmount(item, number);
+    }, 0);
+  }, 0);
+}
+
+// 分割払いを登録
+function addInstallment() {
+  const name =
+    document.getElementById("installmentName").value.trim();
+  const total =
+    Number(document.getElementById("installmentTotal").value);
+  const count =
+    Number(document.getElementById("installmentCount").value);
+  const category =
+    document.getElementById("installmentCategory").value || "その他";
+  const day =
+    Number(document.getElementById("installmentDay").value);
+  const startMonth =
+    document.getElementById("installmentStartMonth").value;
+
+  if (!name || !Number.isInteger(total) || total <= 0 ||
+      !Number.isInteger(count) || count < 2 || count > 120 ||
+      !Number.isInteger(day) || day < 1 || day > 31 ||
+      !startMonth) {
+    alert("すべての項目を正しく入力してください。");
+    return;
+  }
+
+  data.installments.push({
+    id: Date.now(),
+    name,
+    totalAmount: total,
+    count,
+    category,
+    day,
+    startMonth,
+    payments: []
+  });
+
+  document.getElementById("installmentName").value = "";
+  document.getElementById("installmentTotal").value = "";
+  document.getElementById("installmentCount").value = "";
+  document.getElementById("installmentDay").value = "";
+  document.getElementById("installmentStartMonth").value = "";
+
+  saveData();
+}
+
+// 分割払い一覧を表示
+function renderInstallments() {
+  const container = document.getElementById("installmentList");
+  if (!container) return;
+
+  if (!data.installments.length) {
+    container.innerHTML =
+      '<div class="installment-empty">分割払いはまだありません。</div>';
+    return;
+  }
+
+  const today = new Date();
+  const todayKey = formatDate(today);
+  const currentMonth = formatMonth(today);
+
+  container.innerHTML = data.installments.map(item => {
+    const paidCount = item.payments.length;
+    const rows = [];
+
+    for (let i = 0; i < Number(item.count); i++) {
+      const start = new Date(item.startMonth + "-01");
+      start.setMonth(start.getMonth() + i);
+
+      const month = formatMonth(start);
+      if (month > currentMonth) break;
+
+      const number = getInstallmentNumber(item, month);
+      if (!number || isInstallmentPaid(item, month)) continue;
+
+      const dueDate = getInstallmentDueDate(item, month);
+      if (formatDate(dueDate) > todayKey) continue;
+
+      rows.push(`
+        <div class="installment-payment-row">
+          <div>
+            <div>${month}分・第${number}/${item.count}回</div>
+            <strong>${yen(getInstallmentAmount(item, number))}</strong>
+          </div>
+          <button class="installment-paid-button"
+            onclick="markInstallmentPaid(${item.id}, '${month}')">
+            支払い済み
+          </button>
+        </div>
+      `);
+    }
+
+    return `
+      <div class="installment-item">
+        <div class="installment-item-name">
+          ${escapeHtml(item.name)}
+        </div>
+        <div class="installment-item-info">
+          総額：${yen(item.totalAmount)}<br>
+          ${escapeHtml(item.category)}・毎月${item.day}日<br>
+          全${item.count}回・支払い済み ${paidCount}/${item.count}回
+        </div>
+        ${rows.length
+          ? rows.join("")
+          : '<div class="installment-empty">支払日を過ぎた未確認の引き落としはありません。</div>'}
+      </div>
+    `;
+  }).join("");
+}
+
+// 実際の引き落としを確認して計上
+function markInstallmentPaid(id, month) {
+  const item = data.installments.find(x => x.id === id);
+  if (!item) return;
+
+  if (isInstallmentPaid(item, month)) {
+    alert("この月はすでに支払い済みです。");
+    return;
+  }
+
+  const dueDate = getInstallmentDueDate(item, month);
+
+  if (dueDate > new Date()) {
+    alert("引き落とし日を迎えてから確認してください。");
+    return;
+  }
+
+  const number = getInstallmentNumber(item, month);
+  const amount = getInstallmentAmount(item, number);
+
+  if (!confirm(
+    `${item.name} ${month}分 ${yen(amount)}を支払い済みにしますか？`
+  )) return;
+
+  item.payments.push({
+    month,
+    paidAt: formatDate(new Date())
+  });
+
+  saveData();
 }
 
 /* =========================
@@ -1703,8 +1973,13 @@ function render(){
   const fixedExpenseTotal =
     getPaidFixedExpenseTotal();
 
-  const expenseTotal =
-    normalExpenseTotal + fixedExpenseTotal;
+  const installmentExpenseTotal =
+  getPaidInstallmentExpenseTotal();
+
+const expenseTotal =
+  normalExpenseTotal +
+  fixedExpenseTotal +
+  installmentExpenseTotal;
 
   const balance =
     incomeTotal - expenseTotal;
@@ -1721,6 +1996,7 @@ function render(){
   renderHistory();
   renderMonthlySummary();
   renderExpenseChart();
+renderInstallments();
 }
 
 /* =========================
@@ -1768,8 +2044,12 @@ const month =
 
 
   /* 月の支出合計 */
-  const monthlyExpense =
-    normalExpense + fixedExpense;
+ const installmentExpense =
+  getPaidInstallmentPaymentsForMonth(month)
+    .reduce((sum, payment) => sum + payment.amount, 0);
+
+const monthlyExpense =
+  normalExpense + fixedExpense + installmentExpense;
 
 
   /* 月の残高 */
@@ -1816,6 +2096,18 @@ const month =
 
   });
 
+   
+getPaidInstallmentPaymentsForMonth(month).forEach(payment => {
+
+  const category =
+    payment.item.category || "その他";
+
+  categoryTotals[category] =
+    (categoryTotals[category] || 0)
+    + payment.amount;
+
+});
+  
 
  const categoryList =
   document.getElementById("monthlyCategorySummary");
@@ -1913,6 +2205,23 @@ data.categories.forEach(category => {
 
     });
 
+   
+  /* =========================
+     分割払い（支払い済みのみ）
+  ========================= */
+
+  getPaidInstallmentPaymentsForMonth(month).forEach(payment => {
+
+    const category = payment.item.category || "その他";
+
+    if (categories[category] === undefined) {
+      categories[category] = 0;
+    }
+
+    categories[category] += payment.amount;
+
+  });
+  
 
   /* =========================
      金額の大きい順
@@ -2096,24 +2405,37 @@ function renderHistory(){
      履歴をまとめる
   ========================= */
 
-  let history;
+const installmentPayments =
+  getPaidInstallmentPaymentsForMonth(month)
+    .filter(payment =>
+      filter === "すべて" ||
+      payment.item.category === filter
+    )
+    .map(payment => ({
+      id: payment.item.id,
+      name: payment.item.name,
+      category: payment.item.category || "その他",
+      amount: payment.amount,
+      date: payment.payment.paidAt,
+      type: "installment"
+    }));
 
-  if(filter==="すべて"){
+let history;
 
-    history = [
-      ...incomes,
-      ...expenses,
-      ...fixedExpenses
-    ];
-
-  }else{
-
-    history = [
-      ...expenses,
-      ...fixedExpenses
-    ];
-
-  }
+if (filter === "すべて") {
+  history = [
+    ...incomes,
+    ...expenses,
+    ...fixedExpenses,
+    ...installmentPayments
+  ];
+} else {
+  history = [
+    ...expenses,
+    ...fixedExpenses,
+    ...installmentPayments
+  ];
+}
 
 
   /* =========================
@@ -2243,6 +2565,48 @@ function renderHistory(){
 
       }
 
+
+      /* =========================
+         分割払い
+      ========================= */
+
+      if (item.type === "installment") {
+        return `
+        <div class="history-item">
+
+          <div class="history-icon">
+            💳
+          </div>
+
+          <div class="history-info">
+
+            <div class="history-name">
+              ${escapeHtml(item.name)}
+              <span style="
+                font-size:10px;
+                color:var(--sub);
+                margin-left:5px;
+              ">
+                分割払い
+              </span>
+            </div>
+
+            <div class="history-date">
+              ${item.date}
+              ・${escapeHtml(item.category)}
+            </div>
+
+          </div>
+
+          <div class="history-amount expense">
+            -${yen(item.amount)}
+          </div>
+
+        </div>
+        `;
+      }
+
+         
 
       /* =========================
          通常の支出
@@ -2652,6 +3016,16 @@ function renameCategory(index){
 
   });
 
+  /* 分割払いも変更 */
+
+  data.installments.forEach(item => {
+
+    if(item.category === oldName){
+      item.category = trimmedName;
+    }
+
+  });
+     
   saveData();
 
   renderCategorySettings();
@@ -2687,12 +3061,18 @@ function deleteCategory(index){
       item => item.category === category
     );
 
-  if(
+  const usedInInstallments =
+    data.installments.some(
+      item => item.category === category
+    );
+     
+   if(
     usedInExpenses ||
-    usedInFixedExpenses
+    usedInFixedExpenses ||
+    usedInInstallments
   ){
-    alert(
-      "このカテゴリは支出または固定費で使用されています。\n" +
+       alert(
+      "このカテゴリは支出・固定費・分割払いで使用されています。\n" +
       "先に該当するデータのカテゴリを変更してください。"
     );
 
@@ -3009,17 +3389,33 @@ if(!Array.isArray(data.expenses)){
   data.expenses=[];
 }
 
-if(!Array.isArray(data.fixedExpenses)){
-  data.fixedExpenses=[];
+
+if (!Array.isArray(data.fixedExpenses)) {
+  data.fixedExpenses = [];
 }
 
-if(!Array.isArray(data.categories)){
+if (!Array.isArray(data.installments)) {
+  data.installments = [];
+}
+
+data.installments.forEach(item => {
+  if (!Array.isArray(item.payments)) {
+    item.payments = [];
+  }
+});
+
+if(
+  !Array.isArray(data.categories) ||
+  data.categories.length === 0
+){
   data.categories = [...defaultCategories];
 }
 
+renderCategorySelects();
+renderCategorySettings();
 saveData();
+alert("データを復元しました");
 
-      alert("データを復元しました");
 
     }catch{
 
@@ -3357,16 +3753,21 @@ function clearData(){
     return;
   }
 
- data={
-  incomes:[],
-  expenses:[],
-  fixedExpenses:[],
-  categories:[...defaultCategories]
+data = {
+  incomes: [],
+  expenses: [],
+  fixedExpenses: [],
+  installments: [],
+  categories: [...defaultCategories]
 };
 
-  saveData();
-}
+   saveData();
 
+  renderCategorySelects();
+  renderCategorySettings();
+  renderFixedCosts();
+  render();
+}
 
 
 /* =========================
@@ -3405,7 +3806,7 @@ function toggleDarkMode(){
 ========================= */
 
 function changeTheme(color){
-  document.documentElement.style.setProperty("--bg", color);
+  document.documentElement.style.setProperty("--accent", color);
   localStorage.setItem("themeColor", color);
 }
 
@@ -3417,7 +3818,7 @@ function changeTheme(color){
 const savedTheme = localStorage.getItem("themeColor");
 
 if(savedTheme){
-  document.documentElement.style.setProperty("--bg", savedTheme);
+  document.documentElement.style.setProperty("--accent", savedTheme);
 
   const themeInput = document.getElementById("themeColor");
 
