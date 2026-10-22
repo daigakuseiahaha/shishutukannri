@@ -1799,9 +1799,16 @@ function renderInstallments() {
     }
 
     return `
-      <div class="installment-item">
+         <div class="installment-item">
         <div class="installment-item-name">
           ${escapeHtml(item.name)}
+        </div>
+
+        <div class="installment-item-actions">
+          <button type="button"
+            onclick="editInstallment(${item.id})">
+            編集
+          </button>
         </div>
         <div class="installment-item-info">
           総額：${yen(item.totalAmount)}<br>
@@ -1816,6 +1823,64 @@ function renderInstallments() {
   }).join("");
 }
 
+// 分割払いの編集
+function editInstallment(id) {
+  const item = data.installments.find(x => x.id === id);
+  if (!item) return;
+
+  const name = prompt("分割払いの名称を入力してください", item.name);
+  if (name === null) return;
+  if (!name.trim()) {
+    alert("名称を入力してください。");
+    return;
+  }
+
+  const totalAmount = prompt("総額を入力してください", item.totalAmount);
+  if (totalAmount === null) return;
+  if (!Number.isFinite(Number(totalAmount)) || Number(totalAmount) <= 0) {
+    alert("総額は1以上の数値を入力してください。");
+    return;
+  }
+
+  const count = prompt("分割回数を入力してください", item.count);
+  if (count === null) return;
+  if (!Number.isInteger(Number(count)) || Number(count) <= 0) {
+    alert("分割回数は1以上の整数を入力してください。");
+    return;
+  }
+
+  const day = prompt("毎月の引き落とし日を入力してください（1〜31）", item.day);
+  if (day === null) return;
+  if (!Number.isInteger(Number(day)) || Number(day) < 1 || Number(day) > 31) {
+    alert("引き落とし日は1〜31で入力してください。");
+    return;
+  }
+
+  const category = prompt("カテゴリを入力してください", item.category);
+  if (category === null) return;
+  if (!category.trim()) {
+    alert("カテゴリを入力してください。");
+    return;
+  }
+
+  const startMonth = prompt("開始月を入力してください（YYYY-MM）", item.startMonth);
+  if (startMonth === null) return;
+  if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(startMonth)) {
+    alert("開始月は YYYY-MM の形式で入力してください。");
+    return;
+  }
+
+  item.name = name.trim();
+  item.totalAmount = Number(totalAmount);
+  item.count = Number(count);
+  item.day = Number(day);
+  item.category = category.trim();
+  item.startMonth = startMonth;
+
+  saveData();
+  alert("分割払いを更新しました。");
+}
+     
 // 実際の引き落としを確認して計上
 function markInstallmentPaid(id, month) {
   const item = data.installments.find(x => x.id === id);
