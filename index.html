@@ -1804,12 +1804,17 @@ function renderInstallments() {
           ${escapeHtml(item.name)}
         </div>
 
-        <div class="installment-item-actions">
-          <button type="button"
-            onclick="editInstallment(${item.id})">
-            編集
-          </button>
-        </div>
+      <div class="installment-item-actions">
+  <button type="button"
+    onclick="editInstallment(${item.id})">
+    編集
+  </button>
+
+  <button type="button"
+    onclick="deleteInstallment(${item.id})">
+    削除
+  </button>
+</div>
         <div class="installment-item-info">
           総額：${yen(item.totalAmount)}<br>
           ${escapeHtml(item.category)}・毎月${item.day}日<br>
@@ -1885,6 +1890,24 @@ function updateInstallment(id) {
   saveData();
 
   alert("分割払いを更新しました！");
+}
+
+// 分割払いの削除
+function deleteInstallment(id) {
+  const item = data.installments.find(x => x.id === id);
+  if (!item) return;
+
+  const confirmed = confirm(
+    `「${item.name}」を削除しますか？\n支払い履歴も削除されます。この操作は取り消せません。`
+  );
+
+  if (!confirmed) return;
+
+  data.installments = data.installments.filter(x => x.id !== id);
+
+  saveData();
+
+  alert("分割払いを削除しました。");
 }
 
 /* =========================
