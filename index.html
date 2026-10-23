@@ -1910,6 +1910,35 @@ function deleteInstallment(id) {
   alert("分割払いを削除しました。");
 }
 
+
+function markInstallmentPaid(id, month) {
+  const item = data.installments.find(x => x.id === id);
+  if (!item) return;
+
+  if (isInstallmentPaid(item, month)) {
+    alert("この月はすでに支払い済みです。");
+    return;
+  }
+
+  const number = getInstallmentNumber(item, month);
+  if (!number) {
+    alert("この月の支払い情報がありません。");
+    return;
+  }
+
+  const amount = getInstallmentAmount(item, number);
+
+  item.payments.push({
+    month: month,
+    paidAt: formatDate(new Date()),
+    amount: amount
+  });
+
+   saveData();
+  alert("支払い済みに登録しました。");
+}
+
+
 /* =========================
    固定費の支払日判定
 ========================= */
