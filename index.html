@@ -1828,89 +1828,63 @@ function editInstallment(id) {
   const item = data.installments.find(x => x.id === id);
   if (!item) return;
 
-  const name = prompt("分割払いの名称を入力してください", item.name);
-  if (name === null) return;
-  if (!name.trim()) {
-    alert("名称を入力してください。");
-    return;
-  }
+  document.getElementById("installmentName").value = item.name;
+  document.getElementById("installmentTotal").value = item.totalAmount;
+  document.getElementById("installmentCount").value = item.count;
+  document.getElementById("installmentCategory").value = item.category;
+  document.getElementById("installmentDay").value = item.day;
+  document.getElementById("installmentStartMonth").value = item.startMonth;
 
-  const totalAmount = prompt("総額を入力してください", item.totalAmount);
-  if (totalAmount === null) return;
-  if (!Number.isFinite(Number(totalAmount)) || Number(totalAmount) <= 0) {
-    alert("総額は1以上の数値を入力してください。");
-    return;
-  }
+  const form = document.getElementById("installmentForm");
+  form.classList.add("show");
 
-  const count = prompt("分割回数を入力してください", item.count);
-  if (count === null) return;
-  if (!Number.isInteger(Number(count)) || Number(count) <= 0) {
-    alert("分割回数は1以上の整数を入力してください。");
-    return;
-  }
+  const button = form.querySelector(".submit");
+  button.textContent = "変更を保存する";
+  button.onclick = function () {
+    updateInstallment(id);
+  };
 
-  const day = prompt("毎月の引き落とし日を入力してください（1〜31）", item.day);
-  if (day === null) return;
-  if (!Number.isInteger(Number(day)) || Number(day) < 1 || Number(day) > 31) {
-    alert("引き落とし日は1〜31で入力してください。");
-    return;
-  }
-
-  const category = prompt("カテゴリを入力してください", item.category);
-  if (category === null) return;
-  if (!category.trim()) {
-    alert("カテゴリを入力してください。");
-    return;
-  }
-
-  const startMonth = prompt("開始月を入力してください（YYYY-MM）", item.startMonth);
-  if (startMonth === null) return;
-  if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(startMonth)) {
-    alert("開始月は YYYY-MM の形式で入力してください。");
-    return;
-  }
-
-  item.name = name.trim();
-  item.totalAmount = Number(totalAmount);
-  item.count = Number(count);
-  item.day = Number(day);
-  item.category = category.trim();
-  item.startMonth = startMonth;
-
-  saveData();
-  alert("分割払いを更新しました。");
+  form.scrollIntoView({ behavior: "smooth", block: "start" });
 }
-     
-// 実際の引き落としを確認して計上
-function markInstallmentPaid(id, month) {
+
+function updateInstallment(id) {
   const item = data.installments.find(x => x.id === id);
   if (!item) return;
 
-  if (isInstallmentPaid(item, month)) {
-    alert("この月はすでに支払い済みです。");
+  const name = document.getElementById("installmentName").value.trim();
+  const totalAmount = Number(document.getElementById("installmentTotal").value);
+  const count = Number(document.getElementById("installmentCount").value);
+  const category = document.getElementById("installmentCategory").value;
+  const day = Number(document.getElementById("installmentDay").value);
+  const startMonth = document.getElementById("installmentStartMonth").value;
+
+  if (!name || !category || !startMonth ||
+      !Number.isFinite(totalAmount) || totalAmount <= 0 ||
+      !Number.isInteger(count) || count < 1 ||
+      !Number.isInteger(day) || day < 1 || day > 31) {
+    alert("すべての項目を正しく入力してください。");
     return;
   }
 
-  const dueDate = getInstallmentDueDate(item, month);
+  item.name = name;
+  item.totalAmount = totalAmount;
+  item.count = count;
+  item.category = category;
+  item.day = day;
+  item.startMonth = startMonth;
 
-  if (dueDate > new Date()) {
-    alert("引き落とし日を迎えてから確認してください。");
-    return;
-  }
+  const form = document.getElementById("installmentForm");
+  const button = form.querySelector(".submit");
 
-  const number = getInstallmentNumber(item, month);
-  const amount = getInstallmentAmount(item, number);
+  button.textContent = "分割払いを登録する";
+  button.onclick = function () {
+    addInstallment();
+  };
 
-  if (!confirm(
-    `${item.name} ${month}分 ${yen(amount)}を支払い済みにしますか？`
-  )) return;
-
-  item.payments.push({
-    month,
-    paidAt: formatDate(new Date())
-  });
-
+  form.classList.remove("show");
   saveData();
+
+  alert("分割払いを更新しました！");
 }
 
 /* =========================
